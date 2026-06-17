@@ -1,0 +1,27 @@
+
+
+from fastapi import APIRouter
+from backend.api.schemas.jobs import SearchJobBase, SearchJobUpdate, SearchJobCreate, SearchJobResponse, \
+    SearchJobResponses
+
+router = APIRouter()
+
+@router.post(f"/jobs/", response_model=SearchJobResponse)
+async def create_job(job: SearchJobCreate):
+    return job
+
+
+@router.get("/jobs", response_model=SearchJobResponses)
+async def get_jobs():
+    "Returns a list of all jobs"
+    jobs = None
+    return jobs
+
+@router.patch("/jobs/{job_id}")
+async def update_job(job_id: str, job: SearchJobUpdate):
+    updates = job.model_dump(exclude_unset=True)
+    return {
+        "id": job_id,
+        "updates": updates
+    }
+

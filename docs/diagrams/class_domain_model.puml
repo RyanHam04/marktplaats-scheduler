@@ -1,0 +1,29 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class User {
+  id
+  email
+}
+
+class SearchJob {
+  id
+  name
+  query
+  intervalSeconds
+  enabled
+  lastCheckedAt
+  recentListingIds
+}
+
+class PushSubscription {
+  id
+  endpoint
+  key
+  auth
+}
+
+User "1" -- "*" SearchJob
+User "1" -- "*" PushSubscription
+
+@enduml

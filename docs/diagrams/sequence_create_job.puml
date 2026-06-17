@@ -1,0 +1,24 @@
+@startuml
+
+actor User
+
+boundary "Web App" as Web
+control "Job Controller" as Controller
+control "Job Service" as Service
+entity "Search Job" as Job
+database "Database" as DB
+
+User -> Web : Create search job
+Web -> Controller : POST /jobs
+
+Controller -> Service : createJob(...)
+Service -> Job : validate()
+Job -> Service : last_listing
+
+Service -> DB : save(job)
+DB --> Service : id
+
+Service --> Controller : created job
+Controller --> Web : 201 Created
+Web --> User : Display job overview
+@enduml

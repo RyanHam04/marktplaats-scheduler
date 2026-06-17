@@ -1,0 +1,29 @@
+@startuml
+skinparam componentStyle rectangle
+
+package "Browser" {
+  [Web App]
+  [Service Worker]
+}
+
+package "Backend" {
+  [API]
+  [Worker]
+}
+
+database DB
+
+cloud "Marktplaats"
+cloud "Push Service"
+
+[Web App] --> [API]
+[Web App] --> [Service Worker]
+
+[API] --> DB
+[Worker] --> DB
+[Worker] --> Marktplaats
+[Worker] --> "Push Service"
+
+"Push Service" --> [Service Worker]
+
+@enduml

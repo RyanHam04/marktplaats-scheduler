@@ -1,0 +1,36 @@
+@startuml
+left to right direction
+
+actor User
+actor Admin
+
+rectangle "Marktplaats Watcher" {
+
+  usecase "Create search job"
+  usecase "Edit search job"
+  usecase "Delete search job"
+  usecase "Enable/disable search job"
+
+  usecase "View discovered listings"
+
+  usecase "Subscribe to notifications"
+  usecase "Receive listing notifications"
+
+  usecase "Configure polling settings"
+  usecase "Configure persistence settings"
+}
+
+User --> (Create search job)
+User --> (Edit search job)
+User --> (Delete search job)
+User --> (Enable/disable search job)
+
+User --> (View discovered listings)
+
+User --> (Subscribe to notifications)
+User --> (Receive listing notifications)
+
+Admin --> (Configure polling settings)
+Admin --> (Configure persistence settings)
+
+@enduml
