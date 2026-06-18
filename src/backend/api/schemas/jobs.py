@@ -1,9 +1,12 @@
+# src/backend/api/schemas/job_service.py
+
 from datetime import datetime
 from marktplaats import SortBy, SortOrder, Condition
 from pydantic import BaseModel, Field
 
 
 class SearchJobBase(BaseModel):
+    email: str
     query: str = ""
     zip_code: str | None = None
     distance: int | None = None
@@ -17,6 +20,7 @@ class SearchJobBase(BaseModel):
     offered_since: datetime | None = None
     category_name: str | None = None
     extra_attributes: list[int] | None = None
+    check_interval: int = Field(default=3600, ge=60) # seconds
 
 
 class SearchJobCreate(SearchJobBase):
@@ -41,9 +45,9 @@ class SearchJobUpdate(BaseModel):
     extra_attributes: list[int] | None = None
 
 
-class SearchJobResponse(SearchJobBase):
+class SearchJobResponse(BaseModel):
     """Response body."""
-    id: str
+    id: int
 
 class SearchJobResponses(BaseModel):
     jobs: list[SearchJobResponse]

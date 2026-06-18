@@ -1,7 +1,7 @@
 @startuml
 
 control Worker
-database DB
+database "Database \n (jobs)" as DB
 control "Marktplaats Adapter" as Adapter
 control "Notification Service" as Notification
 

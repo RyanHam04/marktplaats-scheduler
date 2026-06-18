@@ -6,16 +6,15 @@ boundary "Web App" as Web
 control "Job Controller" as Controller
 control "Job Service" as Service
 entity "Search Job" as Job
-database "Database" as DB
+database "Database \n (jobs)" as DB
 
 User -> Web : Create search job
 Web -> Controller : POST /jobs
 
 Controller -> Service : createJob(...)
 Service -> Job : validate()
-Job -> Service : last_listing
 
-Service -> DB : save(job)
+Service -> DB : insert(job)
 DB --> Service : id
 
 Service --> Controller : created job

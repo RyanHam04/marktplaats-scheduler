@@ -1,0 +1,40 @@
+@startuml
+
+entity users {
+  * id : BIGINT <<PK>>
+  --
+  email : VARCHAR(255)
+}
+
+entity jobs {
+  * id : BIGINT <<PK>>
+  --
+  user_id : BIGINT <<FK>>
+  interval_seconds : BIGINT
+  query : TEXT
+  category_name : TEXT
+  zip_code : TEXT
+  distance : BIGINT
+  price_from : BIGINT
+  price_to : BIGINT
+  limit : BIGINT
+  sort_by : TEXT
+  sort_order : TEXT
+  condition : TEXT
+  offered_since : TIMESTAMP
+  extra_attributes : JSON
+  enabled : BOOLEAN
+  created_at : TIMESTAMP
+}
+
+entity last_seen_ads {
+  * id : BIGINT <<PK>>
+  --
+  job_id : BIGINT <<FK>>
+  marktplaats_id : VARCHAR(255)
+}
+
+users ||--o{ jobs
+jobs ||--o{ last_seen_ads
+
+@enduml

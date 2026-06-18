@@ -6,10 +6,7 @@ actor Admin
 
 rectangle "Marktplaats Watcher" {
 
-  usecase "Create search job"
-  usecase "Edit search job"
-  usecase "Delete search job"
-  usecase "Enable/disable search job"
+  usecase "CRUD search job"
 
   usecase "View discovered listings"
 
@@ -20,10 +17,7 @@ rectangle "Marktplaats Watcher" {
   usecase "Configure persistence settings"
 }
 
-User --> (Create search job)
-User --> (Edit search job)
-User --> (Delete search job)
-User --> (Enable/disable search job)
+User --> (CRUD search job)
 
 User --> (View discovered listings)
 
