@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from marktplaats import SearchQuery, category_from_name
 
 from backend.api.schemas.jobs import SearchJobCreate
@@ -9,21 +11,24 @@ class JobService:
     def __init__(self, db):
         self.db = db
 
-
     def create_user(self, user: UserRequest):
         return self.db.get_or_create_user_by_email(user.email)
 
     def create_job(self, job: SearchJobCreate) -> Job:
         user = self.db.get_or_create_user_by_email(job.email)
-        params = job.model_dump(mode='json', exclude_none=True, exclude={'email', 'check_interval'})
+        params = job.model_dump(
+            mode="json", exclude_none=True, exclude={"email", "check_interval"}
+        )
+        current_time = datetime.now()
         db_job = Job(
             user_id=user.id,
             check_interval=job.check_interval,
             params=params,
+            last_run_at=current_time,
+            next_run_at=current_time + timedelta(seconds=job.check_interval),
         )
         self.db.submit_job(db_job)
         return db_job
-
 
 
 def build_search_query(job) -> SearchQuery:
@@ -47,4 +52,3 @@ def build_search_query(job) -> SearchQuery:
         )
     except KeyError as e:
         print(e)
-

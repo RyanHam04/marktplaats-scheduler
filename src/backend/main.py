@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from starlette.staticfiles import StaticFiles
 
 from backend.api.router import api_router
 from contextlib import asynccontextmanager
@@ -24,7 +25,6 @@ def create_app() -> FastAPI:
     )
     app.include_router(api_router)
     return app
-
 
 
 app = create_app()

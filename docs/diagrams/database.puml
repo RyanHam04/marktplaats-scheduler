@@ -25,6 +25,8 @@ entity jobs {
   extra_attributes : JSON
   enabled : BOOLEAN
   created_at : TIMESTAMP
+  next_run_at: TIMESTAMP
+  last_run_at: TIMESTAMP
 }
 
 entity last_seen_ads {

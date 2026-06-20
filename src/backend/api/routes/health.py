@@ -7,8 +7,7 @@ from backend.api.schemas.common import HealthRead
 
 router = APIRouter()
 
+
 @router.get(f"/", response_model=HealthRead, status_code=HTTP_200_OK)
 async def get_health():
-    return HealthRead(status='ok')
-
-
+    return HealthRead(status="ok")

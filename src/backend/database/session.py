@@ -1,4 +1,5 @@
 # src/backend/database/session.py
+from datetime import datetime, UTC, timedelta
 
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
@@ -15,6 +16,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+
 
 class Database:
     def __init__(self):
@@ -45,7 +47,6 @@ class Database:
             session.refresh(job)
             return job
 
-
     def delete_job(self, job_id):
         with self.session() as session:
             session.query(Job).filter(Job.id == job_id).delete()
@@ -53,9 +54,7 @@ class Database:
 
     def get_or_create_user_by_email(self, email: str):
         with self.session() as session:
-            user = session.scalar(
-                select(User).where(User.email == email)
-            )
+            user = session.scalar(select(User).where(User.email == email))
 
             if user is None:
                 user = User(email=email)
@@ -63,11 +62,27 @@ class Database:
                 session.commit()
                 session.refresh(user)
 
-
             return user
 
-    
+    def get_due_jobs(self):
+        with self.session() as session:
+            print(datetime.now())
+            return list(
+                session.scalars(select(Job).where(Job.next_run_at <= datetime.now()))
+            )
 
+    def update_timing(self, job_id):
+        with self.session() as session:
+            job = session.scalar(select(Job).where(Job.id == job_id))
+
+            if job is None:
+                raise ValueError(f"Job {job_id} not found")
+
+            now = datetime.now()
+
+            job.last_run_at = now
+            job.next_run_at = now + timedelta(seconds=job.check_interval)
+            session.commit()
 
 
 if __name__ == "__main__":
