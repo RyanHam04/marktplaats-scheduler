@@ -5,15 +5,21 @@ from backend.api.router import api_router
 from contextlib import asynccontextmanager
 
 from backend.database.session import Database
+from backend.services.secret import Settings, AuthService
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    db = Database()
+    settings = Settings()
+
+    db = Database(settings)
+    auth = AuthService(settings)
+
     db.drop_tables()
     db.create_tables()
-    app.state.db = db
 
+    app.state.db = db
+    app.state.auth_service = auth
     yield
     db.engine.dispose()
 

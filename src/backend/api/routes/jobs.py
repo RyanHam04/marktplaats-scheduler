@@ -9,7 +9,9 @@ from backend.api.schemas.jobs import (
     SearchJobResponse,
     SearchJobResponses,
 )
+
 from backend.services.job_service import JobService
+from backend.services.secret import AuthService, Payload
 
 router = APIRouter()
 
@@ -19,12 +21,9 @@ def get_service(request: Request) -> JobService:
 
 
 @router.post("/jobs/", response_model=SearchJobResponse)
-async def create_job(
-    request: SearchJobCreate, service: JobService = Depends(get_service)
-):
-    request.condition = Condition[request.condition]
-    print(request.condition)
-    return service.create_job(request)
+async def create_job(job: SearchJobCreate, service: JobService = Depends(get_service)):
+
+    return service.create_job(job)
 
 
 @router.get("/jobs", response_model=SearchJobResponses)

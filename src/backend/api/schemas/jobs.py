@@ -5,7 +5,14 @@ from enum import Enum
 from typing import Any
 
 from marktplaats import SortBy, SortOrder, Condition, category_from_name
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+from typing_extensions import Annotated
+
+from backend.api.schemas.notifiers import (
+    NtfyNotifierParams,
+    TelegramNotifierParams,
+    EmailNotifierParams,
+)
 
 
 class ConditionRequest(str, Enum):
@@ -18,6 +25,7 @@ class ConditionRequest(str, Enum):
 
 class SearchJobBase(BaseModel):
     email: str
+    token: str
     query: str = ""
     zip_code: str | None = None
     distance: int | None = None
@@ -33,8 +41,8 @@ class SearchJobBase(BaseModel):
     extra_attributes: list[int] | None = None
     check_interval: int = Field(default=3600, ge=0)  # seconds
 
-    def __init__(self, /, **data: Any):
-        super().__init__(**data)
+    @model_validator(mode="after")
+    def validate(self):
         if not self.query and not self.category_name:
             msg = (
                 "Invalid arguments: When the query is empty, "
@@ -51,12 +59,18 @@ class SearchJobBase(BaseModel):
                     "please check the available categories"
                 )
                 raise ValueError(msg)
+        return self
 
 
 class SearchJobCreate(SearchJobBase):
     """Request body for creating a job."""
 
-    pass
+    model_validator(mode="after")
+
+    def format_condition(self):
+        if self.condition is not None:
+            self.condition = Condition[self.condition.name]
+        return self
 
 
 class SearchJobUpdate(BaseModel):

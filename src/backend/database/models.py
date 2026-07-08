@@ -1,7 +1,7 @@
 # src/backend/database/models.py
 from datetime import datetime
 
-from narwhals import Boolean
+
 from sqlalchemy import ForeignKey, String, BigInteger, Text, UniqueConstraint
 from sqlalchemy.dialects.mssql import JSON
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -16,6 +16,8 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    notifier_params: Mapped[dict] = mapped_column(JSON, nullable=False)
+    token: Mapped[str] = mapped_column(unique=True, nullable=False)
 
     jobs: Mapped[list["Job"]] = relationship(back_populates="user")
 
@@ -48,9 +50,5 @@ class LastSeenAd(Base):
     __table_args__ = (UniqueConstraint("job_id", "marktplaats_id"),)
 
 
-class Subscriptions(Base):
-    __tablename__ = "push_subscriptions"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    subscription: Mapped[dict] = mapped_column(JSON, nullable=False)
+# class Notifier(Base):
+#    params: Mapped[dict] = mapped_column(JSON, nullable=False)

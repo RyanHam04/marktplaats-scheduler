@@ -29,14 +29,17 @@ entity jobs {
   last_run_at: TIMESTAMP
 }
 
-entity last_seen_ads {
-  * id : BIGINT <<PK>>
+entity notifier {
+  * id: BIGINT <<PK>>
   --
-  job_id : BIGINT <<FK>>
-  marktplaats_id : VARCHAR(255)
+  user_id: BIGINT <<FK>>
+  params: JSON
 }
 
+
+
 users ||--o{ jobs
+users ||--|| notifier
 jobs ||--o{ last_seen_ads
 
 @enduml

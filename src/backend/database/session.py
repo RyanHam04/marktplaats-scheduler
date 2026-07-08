@@ -4,29 +4,18 @@ from datetime import datetime, UTC, timedelta
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 from pydantic_settings import BaseSettings
-
+import secrets
+from backend.api.schemas.users import UserCreate
 from backend.database.models import Base, Job, User
-
-
-class Settings(BaseSettings):
-    db_host: str
-    db_user: str
-    db_password: str
-    db_name: str
-
-    class Config:
-        env_file = ".env"
+from backend.services.secret import Settings
 
 
 class Database:
-    def __init__(self):
-        settings = Settings()
-
+    def __init__(self, settings: Settings):
         db_url = (
             f"postgresql+psycopg://{settings.db_user}:"
             f"{settings.db_password}@{settings.db_host}/{settings.db_name}"
         )
-
         self.engine = create_engine(db_url)
         self.session = sessionmaker(
             bind=self.engine,
@@ -52,17 +41,33 @@ class Database:
             session.query(Job).filter(Job.id == job_id).delete()
             session.commit()
 
-    def get_or_create_user_by_email(self, email: str):
+    def get_user_by_token(self, token: str):
         with self.session() as session:
-            user = session.scalar(select(User).where(User.email == email))
+            user_db = session.scalar(select(User).where(User.token == token))
+            print(token)
+            if user_db is None:
+                raise ValueError("Invalid user token")
 
-            if user is None:
-                user = User(email=email)
-                session.add(user)
-                session.commit()
-                session.refresh(user)
+            return user_db
 
-            return user
+    def create_user(self, user: UserCreate):
+        with self.session() as session:
+            user_db = session.scalar(select(User).where(User.email == user.email))
+
+            if user_db is not None:
+                raise ValueError("User already exists")
+
+            user_db = User(
+                email=user.email,
+                token=secrets.token_urlsafe(32),
+                notifier_params=user.notifier_params.model_dump(mode="json"),
+            )
+
+            session.add(user_db)
+            session.commit()
+            session.refresh(user_db)
+
+            return user_db
 
     def get_due_jobs(self):
         with self.session() as session:
