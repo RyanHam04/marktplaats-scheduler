@@ -29,3 +29,4 @@ class NtfyNotifier(Notifier):
 
     def send(self, message: str) -> None:
         self.client.send(message)
+        print("Sent to Ntfy client")

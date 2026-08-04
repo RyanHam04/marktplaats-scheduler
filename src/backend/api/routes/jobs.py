@@ -1,7 +1,6 @@
 # src/backend/api/routes/job_service.py
 
 from fastapi import APIRouter, Depends, Request
-from marktplaats import Condition
 
 from backend.api.schemas.jobs import (
     SearchJobUpdate,
@@ -11,7 +10,6 @@ from backend.api.schemas.jobs import (
 )
 
 from backend.services.job_service import JobService
-from backend.services.secret import AuthService, Payload
 
 router = APIRouter()
 

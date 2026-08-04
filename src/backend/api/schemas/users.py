@@ -14,8 +14,7 @@ from backend.api.schemas.notifiers import (
 
 
 class UserBase(BaseModel):
-    email: str
-
+    pass
 
 class UserCreate(UserBase):
     notifier_params: Annotated[
@@ -31,6 +30,5 @@ class UserDelete(UserBase):
 
 class UserResponse(BaseModel):
     id: int
-    email: str
     token: str
     notifier_params: NtfyNotifierParams | TelegramNotifierParams | EmailNotifierParams

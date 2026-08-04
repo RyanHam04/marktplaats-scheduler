@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, model_validator
 
 
 class NotifierParams(BaseModel):
-    pass
+    type: str
 
 
 class NtfyNotifierParams(NotifierParams):

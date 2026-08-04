@@ -23,23 +23,15 @@ class ConditionRequest(str, Enum):
     NOT_WORKING = "NOT_WORKING"
 
 
-class SearchJobBase(BaseModel):
-    email: str
-    token: str
+class SearchParams(BaseModel):
     query: str = ""
     zip_code: str | None = None
-    distance: int | None = None
+    distance_km: int | None = None
     price_from: int | None = None
     price_to: int | None = None
-    limit: int = Field(default=10, ge=1, le=100)
-    offset: int = Field(default=0, ge=0)
-    sort_by: SortBy = SortBy.OPTIMIZED
-    sort_order: SortOrder = SortOrder.ASC
-    condition: ConditionRequest | None = None
-    offered_since: datetime | None = None
+    condition: str | None = None
     category_name: str | None = None
     extra_attributes: list[int] | None = None
-    check_interval: int = Field(default=3600, ge=0)  # seconds
 
     @model_validator(mode="after")
     def validate(self):
@@ -50,50 +42,55 @@ class SearchJobBase(BaseModel):
             )
             raise ValueError(msg)
 
+        if self.distance_km is None or self.zip_code is None:
+            raise ValueError(
+                "zip_code and distance are required."
+            )
+
         if self.category_name:
             try:
-                print(category_from_name(self.category_name))
+                category_from_name(self.category_name)
             except ValueError:  # Should become dropdown menu in frontend
                 msg = (
                     "Invalid arguments: Category not available, "
                     "please check the available categories"
                 )
                 raise ValueError(msg)
+        if (
+            self.price_from is not None
+            and self.price_to is not None
+            and self.price_from > self.price_to
+        ):
+            msg = (
+                "price_from cannot be greater than price_to."
+            )
+            raise ValueError(msg)
+
         return self
 
 
-class SearchJobCreate(SearchJobBase):
-    """Request body for creating a job."""
+class SearchJobCreate(BaseModel):
+    token: str
+    search: SearchParams
+    check_interval: int = Field(default=3600)
 
-    model_validator(mode="after")
-
-    def format_condition(self):
-        if self.condition is not None:
-            self.condition = Condition[self.condition.name]
-        return self
-
-
-class SearchJobUpdate(BaseModel):
-    """Request body for updating a job."""
-
+class SearchParamsUpdate(BaseModel):
     query: str | None = None
     zip_code: str | None = None
-    distance: int | None = None
+    distance_km: int | None = None
     price_from: int | None = None
     price_to: int | None = None
-    limit: int | None = Field(default=None, ge=1, le=100)
-    offset: int | None = Field(default=None, ge=0)
-    sort_by: SortBy | None = None
-    sort_order: SortOrder | None = None
-    condition: Condition | None = None
-    offered_since: datetime | None = None
+    condition: ConditionRequest | None = None
     category_name: str | None = None
     extra_attributes: list[int] | None = None
 
 
-class SearchJobResponse(BaseModel):
-    """Response body."""
+class SearchJobUpdate(BaseModel):
+    search: SearchParamsUpdate | None = None
+    check_interval: int | None = Field(default=None)
+    enabled: bool | None = None
 
+class SearchJobResponse(BaseModel):
     id: int
 
 

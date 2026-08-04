@@ -15,7 +15,6 @@ async def lifespan(app: FastAPI):
     db = Database(settings)
     auth = AuthService(settings)
 
-    db.drop_tables()
     db.create_tables()
 
     app.state.db = db

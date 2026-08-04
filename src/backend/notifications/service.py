@@ -11,14 +11,23 @@ from backend.api.schemas.notifiers import (
 
 
 def create_notifier(params: NotifierParams) -> Notifier:
-    match params:
-        case NtfyNotifierParams():
-            return NtfyNotifier(params)
-        case TelegramNotifierParams():
-            return TelegramNotifier(params)
-        case EmailNotifierParams():
-            return EmailNotifier(params)
+    if isinstance(params, NtfyNotifierParams):
+        return NtfyNotifier(params)
 
+    if isinstance(params, TelegramNotifierParams):
+        return TelegramNotifier(params)
 
-def compose_message(listings):
-    pass
+    if isinstance(params, EmailNotifierParams):
+        return EmailNotifier(params)
+
+def compose_message(listings) -> str:
+    lines = [f"{len(listings)} Marktplaats listings found", ""]
+
+    for listing in listings[:10]:
+        lines.append(
+            f"{listing.title}\n"
+            f"{listing.price_as_string(lang='nl')}\n"
+            f"{listing.link}\n"
+        )
+
+    return "\n".join(lines)
